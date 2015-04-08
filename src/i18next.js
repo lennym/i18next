@@ -105,22 +105,111 @@
         return this._lng;
     };
 
+    Translator.prototype.addResource = function (lng, ns, key, value) {
+        if (typeof ns !== 'string') {
+            resource = ns;
+            ns = this.options.ns.defaultNs;
+        } else if (this.options.ns.namespaces.indexOf(ns) < 0) {
+            this.options.ns.namespaces.push(ns);
+        }
+
+        this.resStore[lng] = this.resStore[lng] || {};
+        this.resStore[lng][ns] = this.resStore[lng][ns] || {};
+
+        var keys = key.split(this.options.keyseparator);
+        var node = this.resStore[lng][ns];
+        var origRef = node;
+
+        while (key = keys.shift()) {
+            if (!keys.length)
+                node[key] = value;
+            else {
+                if (node[key] == null) {
+                    node[key] = {};
+                }
+                node = node[key];
+            }
+        }
+    };
+
+    Translator.prototype.addResources = function (lng, ns, resources) {
+        if (typeof ns !== 'string') {
+            resource = ns;
+            ns = this.options.ns.defaultNs;
+        } else if (this.options.ns.namespaces.indexOf(ns) < 0) {
+            this.options.ns.namespaces.push(ns);
+        }
+
+        for (var m in resources) {
+            if (typeof resources[m] === 'string') {
+                this.addResource(lng, ns, m, resources[m]);
+            }
+        }
+    };
+
+    Translator.prototype.addResourceBundle = function addResourceBundle(lng, ns, resources, deep) {
+        if (typeof ns !== 'string') {
+            resources = ns;
+            ns = this.options.ns.defaultNs;
+        } else if (this.options.ns.namespaces.indexOf(ns) < 0) {
+            this.options.ns.namespaces.push(ns);
+        }
+
+        this.resStore[lng] = this.resStore[lng] || {};
+        this.resStore[lng][ns] = this.resStore[lng][ns] || {};
+
+        if (deep) {
+            i18n.functions.deepExtend(this.resStore[lng][ns], resources);
+        } else {
+            i18n.functions.extend(this.resStore[lng][ns], resources);
+        }
+    };
+
     var translator;
+    var methods = [
+        'configure',
+        'translate',
+        't',
+        'addResource',
+        'addResources',
+        'addResourceBundle',
+        'hasResourceBundle'
+    ];
     var i18n = {
         init: function (options, callback) {
             if (translator) {
                 translator.configure(options, callback);
             } else {
                 translator = new Translator(options);
-                i18n.t = function () {
-                    return translator.t.apply(translator, arguments);
-                };
+                i18n.functions.each(methods, function (i, method) {
+                    i18n[method] = function () { return translator[method].apply(translator, arguments); };
+                });
+                /*
+                i18n.preload = preload;
+                i18n.hasResourceBundle = hasResourceBundle;
+                i18n.getResourceBundle = getResourceBundle;
+                i18n.removeResourceBundle = removeResourceBundle;
+                i18n.loadNamespace = loadNamespace;
+                i18n.loadNamespaces = loadNamespaces;
+                i18n.setDefaultNamespace = setDefaultNamespace;
+                i18n.t = translate;
+                i18n.translate = translate;
+                i18n.exists = exists;
+                */
                 translator.ready(callback);
             }
             return translator;
         },
         functions: {
             extend: $.extend,
+            deepExtend: function _deepExtend(target, source) {
+                for (var prop in source)
+                    if (prop in target)
+                        _deepExtend(target[prop], source[prop]);
+                    else
+                        target[prop] = source[prop];
+                return target;
+            },
             each: $.each,
             ajax: $.ajax,
             regexEscape: function(str) {
