@@ -23,7 +23,7 @@
         });
     }
 
-    Translator.prototype.configure = function (options, callback) {
+    Translator.prototype.configure = function configure(options, callback) {
         var self = this;
 
         options = options || {};
@@ -54,7 +54,7 @@
         }
     };
 
-    Translator.prototype.ready = function (fn) {
+    Translator.prototype.ready = function ready(fn) {
         if (this._initialized) {
             fn();
         } else {
@@ -72,7 +72,7 @@
         }
     };
 
-    Translator.prototype.translate = function (key, options) {
+    Translator.prototype.translate = function translate(key, options) {
         options = options || {};
         options.lng = options.lng || i18n.functions.toLanguages(this.lng(), this.options);
         options.ns = options.ns || this.options.ns.defaultNs;
@@ -109,14 +109,14 @@
     };
     Translator.prototype.t = Translator.prototype.translate;
 
-    Translator.prototype.lng = function (lng) {
+    Translator.prototype.lng = function lng(lng) {
         if (lng) {
             this._lng = lng;
         }
         return this._lng;
     };
 
-    Translator.prototype.addResource = function (lng, ns, key, value) {
+    Translator.prototype.addResource = function addResource(lng, ns, key, value) {
         if (typeof ns !== 'string') {
             resource = ns;
             ns = this.options.ns.defaultNs;
@@ -143,7 +143,7 @@
         }
     };
 
-    Translator.prototype.addResources = function (lng, ns, resources) {
+    Translator.prototype.addResources = function addResources(lng, ns, resources) {
         if (typeof ns !== 'string') {
             resource = ns;
             ns = this.options.ns.defaultNs;
