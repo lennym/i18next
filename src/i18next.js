@@ -263,7 +263,7 @@
             log: function () {},
             getCountryIndexOfLng: function(lng) {
                 var lng_index = 0;
-                if (lng === 'nb-NO' || lng === 'nn-NO' || lng === 'nb-no' || lng === 'nn-no') lng_index = 1;
+                if (lng.match(/^n(b|n)\-no$/i)) { lng_index = 1; }
                 return lng_index;
             },
             toLanguages: function(lng, o) {
