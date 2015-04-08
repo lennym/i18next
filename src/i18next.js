@@ -261,7 +261,7 @@
                 }
             },
             log: function () {},
-            getCountyIndexOfLng: function(lng) {
+            getCountryIndexOfLng: function(lng) {
                 var lng_index = 0;
                 if (lng === 'nb-NO' || lng === 'nn-NO' || lng === 'nb-no' || lng === 'nn-no') lng_index = 1;
                 return lng_index;
@@ -297,7 +297,7 @@
                     var parts = lng.split('-');
 
                     if (o.load !== 'unspecific') addLanguage(applyCase(lng));
-                    if (o.load !== 'current') addLanguage(applyCase(parts[this.getCountyIndexOfLng(lng)]));
+                    if (o.load !== 'current') addLanguage(applyCase(parts[this.getCountryIndexOfLng(lng)]));
                 } else {
                     addLanguage(applyCase(lng));
                 }
