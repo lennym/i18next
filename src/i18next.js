@@ -16,7 +16,13 @@
     };
 
     function Translator(options) {
+        var self = this;
+        this.configure(options, function () {
+            self._ready();
+        });
+    }
 
+    Translator.prototype.configure = function (options, callback) {
         var self = this;
 
         options = options || {};
@@ -38,14 +44,14 @@
 
         if (this.options.resStore) {
             this.resStore = this.options.resStore;
-            this._ready();
+            callback();
         } else {
             sync.load(i18n.functions.toLanguages(this.lng(), this.options), this.options, function (err, store) {
                 self.resStore = store;
-                self._ready();
+                callback();
             });
         }
-    }
+    };
 
     Translator.prototype.ready = function (fn) {
         if (this._initialized) {
@@ -99,13 +105,18 @@
         return this._lng;
     };
 
+    var translator;
     var i18n = {
         init: function (options, callback) {
-            var translator = new Translator(options);
-            i18n.t = function () {
-                return translator.t.apply(translator, arguments);
-            };
-            translator.ready(callback);
+            if (translator) {
+                translator.configure(options, callback);
+            } else {
+                translator = new Translator(options);
+                i18n.t = function () {
+                    return translator.t.apply(translator, arguments);
+                };
+                translator.ready(callback);
+            }
             return translator;
         },
         functions: {
