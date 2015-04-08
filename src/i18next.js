@@ -23,17 +23,21 @@
 
         this.options = {};
         this._onready = [];
-        i18n.functions.extend(options, defaults);
-        i18n.functions.extend(this.options, options);
 
+        this.options = i18n.functions.extend(i18n.functions.extend({}, defaults), options);
         if (typeof this.options.fallbackLng === 'string') {
             this.options.fallbackLng = [this.options.fallbackLng];
         }
-
+        if (typeof this.options.ns === 'string') {
+            this.options.ns = {
+                namespaces: [this.options.ns],
+                defaultNs: this.options.ns
+            };
+        }
         this.lng(this.options.lng);
 
-        if (options.resStore) {
-            this.resStore = options.resStore;
+        if (this.options.resStore) {
+            this.resStore = this.options.resStore;
             this._ready();
         } else {
             sync.load(i18n.functions.toLanguages(this.lng(), this.options), this.options, function (err, store) {
@@ -63,27 +67,28 @@
 
     Translator.prototype.translate = function (key, options) {
         options = options || {};
-        options.lng = options.lng || this.lng();
+        options.lng = options.lng || i18n.functions.toLanguages(this.lng(), this.options);
+
+        if (typeof options.lng === 'string') {
+            options.lng = [options.lng];
+        }
 
         var parts = key.split(this.options.keyseparator),
-            lng = this.resStore[options.lng][this.options.ns.defaultNs] || {},
+            lng = this.resStore[options.lng[0]][this.options.ns.defaultNs] || {},
             slug;
 
         while (slug = parts.shift()) {
             lng = lng ? lng[slug] : null;
         }
 
-        if (!lng || lng === {}) {
-            if (options.lng === this.options.fallbackLng) {
-                return key;
-            } else if (options.lng.indexOf('-') > -1) {
-                return this.translate(key, { lng: options.lng.split('-')[0] });
-            } else {
-                return this.translate(key, { lng: this.options.fallbackLng });
-            }
+        if (lng) {
+            return lng;
+        } else if (options.lng.length > 1) {
+            options.lng.shift();
+            return this.translate(key, options);
+        } else {
+            return key;
         }
-
-        return lng;
     };
     Translator.prototype.t = Translator.prototype.translate;
 
