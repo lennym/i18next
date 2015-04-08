@@ -2,21 +2,16 @@ describe('setting load', function() {
 
   describe('to current', function() {
 
-    var spy; 
-
     beforeEach(function(done) {
-      spy = sinon.spy(i18n.sync, '_fetchOne');
-      i18n.init(i18n.functions.extend(opts, { 
+      i18n.init(i18n.functions.extend(opts, {
           load: 'current' }),
         function(t) { done(); });
     });
 
-    afterEach(function() {
-      spy.restore();
-    });
-
     it('it should load only current and fallback language', function() {
-      expect(spy.callCount).to.be(2); // en-US, en
+      expect(i18n.hasResourceBundle('en-US')).to.be(true);
+      expect(i18n.hasResourceBundle('en')).to.be(false);
+      expect(i18n.hasResourceBundle('dev')).to.be(true);
     });
 
     it('it should provide loaded resources for translation', function() {
@@ -29,21 +24,16 @@ describe('setting load', function() {
 
   describe('to unspecific', function() {
 
-    var spy; 
-
     beforeEach(function(done) {
-      spy = sinon.spy(i18n.sync, '_fetchOne');
-      i18n.init(i18n.functions.extend(opts, { 
+      i18n.init(i18n.functions.extend(opts, {
           load: 'unspecific' }),
         function(t) { done(); });
     });
 
-    afterEach(function() {
-      spy.restore();
-    });
-
     it('it should load only unspecific and fallback language', function() {
-      expect(spy.callCount).to.be(2); // en-US, en
+      expect(i18n.hasResourceBundle('en-US')).to.be(false);
+      expect(i18n.hasResourceBundle('en')).to.be(true);
+      expect(i18n.hasResourceBundle('dev')).to.be(true);
     });
 
     it('it should provide loaded resources for translation', function() {
@@ -62,21 +52,16 @@ describe('setting load', function() {
 
 describe('with fallback language set to false', function() {
 
-  var spy; 
-
   beforeEach(function(done) {
-    spy = sinon.spy(i18n.sync, '_fetchOne');
-    i18n.init(i18n.functions.extend(opts, { 
+    i18n.init(i18n.functions.extend(opts, {
         fallbackLng: false }),
       function(t) { done(); });
   });
 
-  afterEach(function() {
-    spy.restore();
-  });
-
   it('it should load only specific and unspecific languages', function() {
-    expect(spy.callCount).to.be(2); // en-US, en
+    expect(i18n.hasResourceBundle('en-US')).to.be(true);
+    expect(i18n.hasResourceBundle('en')).to.be(true);
+    expect(i18n.hasResourceBundle('dev')).to.be(false);
   });
 
   it('it should provide loaded resources for translation', function() {

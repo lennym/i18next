@@ -111,7 +111,7 @@
 
     Translator.prototype.lng = function lng(lng) {
         if (lng) {
-            this._lng = lng;
+            this._lng = i18n.functions.toLanguages(lng, this.options)[0];
         }
         return this._lng;
     };
@@ -217,6 +217,7 @@
         'configure',
         'translate',
         't',
+        'lng',
         'addResource',
         'addResources',
         'addResourceBundle',

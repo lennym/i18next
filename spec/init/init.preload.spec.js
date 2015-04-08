@@ -1,20 +1,15 @@
-describe('preloading multiple languages', function() {
-
-  var spy; 
+xdescribe('preloading multiple languages', function() {
 
   beforeEach(function(done) {
-    spy = sinon.spy(i18n.sync, '_fetchOne');
-    i18n.init(i18n.functions.extend(opts, { 
+    i18n.init(i18n.functions.extend(opts, {
         preload: ['fr', 'de-DE'] }),
       function(t) { done(); });
   });
 
-  afterEach(function() {
-    spy.restore();
-  });
-
   it('it should load additional languages', function() {
-    expect(spy.callCount).to.be(6); // en-US, en, de-DE, de, fr, dev
+    expect(i18n.hasResourceBundle('fr')).to.be(true);
+    expect(i18n.hasResourceBundle('de-DE')).to.be(true);
+    expect(i18n.hasResourceBundle('de')).to.be(true);
   });
 
   describe('changing the language', function() {
