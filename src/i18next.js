@@ -176,6 +176,24 @@
         }
     };
 
+    Translator.prototype.hasResourceBundle = function hasResourceBundle(lng, ns) {
+        if (typeof ns !== 'string') {
+            ns = this.options.ns.defaultNs;
+        }
+
+        this.resStore[lng] = this.resStore[lng] || {};
+        var res = this.resStore[lng][ns] || {};
+
+        var hasValues = false;
+        for(var prop in res) {
+            if (res.hasOwnProperty(prop)) {
+                hasValues = true;
+            }
+        }
+
+        return hasValues;
+    };
+
     var translator;
     var methods = [
         'configure',
