@@ -227,6 +227,7 @@
     ];
     var i18n = {
         init: function (options, callback) {
+            callback = callback || function () {};
             if (translator) {
                 translator.configure(options, callback);
             } else {
