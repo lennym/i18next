@@ -194,6 +194,24 @@
         return hasValues;
     };
 
+    Translator.prototype.getResourceBundle = function getResourceBundle(lng, ns) {
+        if (typeof ns !== 'string') {
+            ns = this.options.ns.defaultNs;
+        }
+
+        this.resStore[lng] = this.resStore[lng] || {};
+        return i18n.functions.extend({}, this.resStore[lng][ns]);
+    };
+
+    Translator.prototype.removeResourceBundle = function removeResourceBundle(lng, ns) {
+        if (typeof ns !== 'string') {
+            ns = this.options.ns.defaultNs;
+        }
+
+        this.resStore[lng] = this.resStore[lng] || {};
+        this.resStore[lng][ns] = {};
+    };
+
     var translator;
     var methods = [
         'configure',
@@ -202,7 +220,9 @@
         'addResource',
         'addResources',
         'addResourceBundle',
-        'hasResourceBundle'
+        'hasResourceBundle',
+        'getResourceBundle',
+        'removeResourceBundle'
     ];
     var i18n = {
         init: function (options, callback) {
@@ -213,18 +233,7 @@
                 i18n.functions.each(methods, function (i, method) {
                     i18n[method] = function () { return translator[method].apply(translator, arguments); };
                 });
-                /*
-                i18n.preload = preload;
-                i18n.hasResourceBundle = hasResourceBundle;
-                i18n.getResourceBundle = getResourceBundle;
-                i18n.removeResourceBundle = removeResourceBundle;
-                i18n.loadNamespace = loadNamespace;
-                i18n.loadNamespaces = loadNamespaces;
-                i18n.setDefaultNamespace = setDefaultNamespace;
-                i18n.t = translate;
-                i18n.translate = translate;
-                i18n.exists = exists;
-                */
+
                 translator.ready(callback);
             }
             return translator;
