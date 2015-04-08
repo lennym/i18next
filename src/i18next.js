@@ -80,7 +80,7 @@
         }
 
         var parts = key.split(this.options.keyseparator),
-            lng = this.resStore[options.lng[0]][this.options.ns.defaultNs] || {},
+            lng = (this.resStore[options.lng[0]] || {})[this.options.ns.defaultNs] || {},
             slug;
 
         while (slug = parts.shift()) {
