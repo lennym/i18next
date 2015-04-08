@@ -6,6 +6,7 @@
 
     var defaults = {
         keyseparator: '.',
+        nsseparator: ':',
         lng: 'en-US',
         fallbackLng: ['dev'],
         ns: {
@@ -74,15 +75,25 @@
     Translator.prototype.translate = function (key, options) {
         options = options || {};
         options.lng = options.lng || i18n.functions.toLanguages(this.lng(), this.options);
+        options.ns = options.ns || this.options.ns.defaultNs;
 
         if (typeof options.lng === 'string') {
             options.lng = [options.lng];
         }
 
-        var parts = key.split(this.options.keyseparator),
-            lng = (this.resStore[options.lng[0]] || {})[this.options.ns.defaultNs] || {},
+        var parts;
+
+        if (key.indexOf(this.options.nsseparator) > -1) {
+            parts = key.split(this.options.nsseparator);
+            options.ns = parts[0];
+            key = parts[1];
+        }
+
+
+        var lng = (this.resStore[options.lng[0]] || {})[options.ns] || {},
             slug;
 
+        parts = key.split(this.options.keyseparator);
         while (slug = parts.shift()) {
             lng = lng ? lng[slug] : null;
         }
