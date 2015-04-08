@@ -1,30 +1,89 @@
+// i18next, v1.8.1
+// Copyright (c)2015 Jan Mühlemann (jamuhl).
+// Distributed under MIT license
+// http://i18next.com
 (function(root) {
 
-    //= i18next.shim.js
+    var defaults = {
+        keyseparator: '.',
+        lng: 'en-US',
+        fallbackLng: 'dev',
+        namespace: 'translation'
+    };
 
-    var $ = root.jQuery || root.Zepto
-      , i18n = {}
-      , resStore = {}
-      , currentLng
-      , replacementCounter = 0
-      , languages = []
-      , initialized = false
-      , sync = {};
+    function Translator(options) {
+        options = options || {};
+
+        this.options = {};
+        i18n.functions.extend(options, defaults);
+        i18n.functions.extend(this.options, options);
+
+        if (options.resStore) {
+            this.resStore = options.resStore;
+        }
+        this.lng(this.options.lng);
+    }
+
+    Translator.prototype.translate = function (key, options) {
+        options = options || {};
+        options.lng = options.lng || this.lng();
+
+        var parts = key.split(this.options.keyseparator),
+            lng = this.resStore[options.lng][this.options.namespace] || {},
+            slug;
+
+        while (slug = parts.shift()) {
+            lng = lng ? lng[slug] : null;
+        }
+
+        if (!lng || lng === {}) {
+            if (options.lng === this.options.fallbackLng) {
+                return key;
+            } else if (options.lng.indexOf('-') > -1) {
+                return this.translate(key, { lng: options.lng.split('-')[0] });
+            } else {
+                return this.translate(key, { lng: this.options.fallbackLng });
+            }
+        }
+
+        return lng;
+    };
+    Translator.prototype.t = Translator.prototype.translate;
+
+    Translator.prototype.lng = function (lng) {
+        if (lng) {
+            this._lng = lng;
+        }
+        return this._lng;
+    };
+
+    var i18n = {
+        init: function (options, callback) {
+            var translator = new Translator(options);
+            i18n.t = function () {
+                return translator.t.apply(translator, arguments);
+            };
+            callback(i18n.t);
+            return translator;
+        },
+        functions: {
+            extend: $.extend
+        }
+    };
 
 
+    // Export the i18next object for **CommonJS**.
+    // If we're not in CommonJS, add `i18n` to the
+    // global object or to jquery.
+    if (typeof module !== 'undefined' && module.exports) {
+        module.exports = i18n;
+    } else {
+        if ($) {
+            $.i18n = $.i18n || i18n;
+        }
 
-    //= i18next.exports.js
-    //= i18next.sync.js
-    //= i18next.defaults.js
-    //= i18next.helpers.js
-    //= i18next.init.js
-    //= i18next.functions.js
-    //= i18next.jquery.js
-    //= i18next.translate.js
-    //= i18next.detectLanguage.js
-    //= i18next.plurals.js
-    //= i18next.postProcessor.js
-    //= i18next.postProcessor.sprintf.js
-    //= i18next.api.js
+        root.i18n = root.i18n || i18n;
+    }
+
 
 })(typeof exports === 'undefined' ? window : exports);
