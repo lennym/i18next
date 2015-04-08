@@ -15,3 +15,5 @@ node_modules/**/*
 bin
 reports
 reports/**/*
+test/test.js
+test/server
